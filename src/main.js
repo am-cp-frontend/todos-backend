@@ -20,7 +20,7 @@ const defaultDatabaseState = () => ({
 })
 
 const app = express()
-app.use(bodyParser.json())
+app.use(bodyParser.text())
 
 setupRegisterRoute(app)
 setupTodoRoute(app)

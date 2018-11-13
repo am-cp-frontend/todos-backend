@@ -5,7 +5,9 @@ const db = databaseWrapper()
 // const root = db.getRoot()
 
 const headers = {
-  'Access-Control-Allow-Origin': '*'
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type'
 }
 
 const makeResponse = todos => ({
@@ -40,7 +42,7 @@ module.exports = app => {
     const hash = req.params.hash
 
     const todos = root.todos[hash]
-    const todo = req.body
+    const todo = JSON.parse(req.body)
 
     res.set(headers)
 
