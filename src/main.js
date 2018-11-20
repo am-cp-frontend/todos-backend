@@ -12,6 +12,7 @@ logging({
 const database = require('./modules/databaseWrapper');
 const db = database('db.json', 7);
 
+const applyMiddleware = require('./modules/cors')
 const setupRegisterRoute = require('./modules/register')
 const setupTodoRoute = require('./modules/todos')
 
@@ -21,6 +22,8 @@ const defaultDatabaseState = () => ({
 
 const app = express()
 app.use(bodyParser.text())
+
+applyMiddleware(app)
 
 setupRegisterRoute(app)
 setupTodoRoute(app)

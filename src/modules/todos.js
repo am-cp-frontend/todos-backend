@@ -1,14 +1,9 @@
 const databaseWrapper = require('./databaseWrapper')
 
+const schemas = require('./schema/schemas')
+const matchesSchema = require('./schema/matchesSchema')
+
 const db = databaseWrapper()
-
-// const root = db.getRoot()
-
-const headers = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type'
-}
 
 const makeResponse = todos => ({
   response: todos
@@ -22,8 +17,6 @@ module.exports = app => {
     console.log(root)
 
     const todos = root.todos[hash]
-
-    res.set(headers)
 
     if (!root.todos.hasOwnProperty(hash)) {
       res.send({
@@ -44,13 +37,14 @@ module.exports = app => {
     const todos = root.todos[hash]
     const todo = JSON.parse(req.body)
 
-    res.set(headers)
-
-    if (todo.todoText) {
-      todos.push(todo.todoText)
+    if (matchesSchema(todo, schemas.additionSchema)) {
+      todos.push({
+        text: todo.text,
+        done: todo.done || false
+      })
 
       res.send({
-        result: 'ok'
+        response: 'ok'
       })
     } else {
       res.send({
@@ -59,5 +53,58 @@ module.exports = app => {
     }
 
     res.end()    
+  })
+
+  app.delete('/todos/:hash', (req, res) => {
+    const root = db.getRoot()
+
+    const hash = req.params.hash
+
+    const todos = root.todos[hash]
+    const options = JSON.parse(req.body)
+
+    if (matchesSchema(options, schemas.deletionSchema)) {
+      todos.splice(options.index, 1)
+
+      res.send({
+        response: 'ok'
+      })
+    } else {
+      res.send({
+        error: 'Invalid request format'
+      })
+    }
+  })
+
+  app.put('/todos/:hash', (req, res) => {
+    const root = db.getRoot()
+
+    const hash = req.params.hash
+
+    const todos = root.todos[hash]
+    const options = JSON.parse(req.body)
+
+    if (matchesSchema(options, schemas.editingSchema)) {
+      if (!todos[options.index]) {
+        res.send({
+          error: 'No todo at such index is present'
+        })
+        
+        return
+      }
+
+      const todo = todos[options.index]
+
+      todo.text = options.hasOwnProperty('text') ? options.text : todo.text
+      todo.done = options.hasOwnProperty('done') ? options.done : todo.done
+
+      res.send({
+        reponse: 'ok'
+      })
+    } else {
+      res.send({
+        error: 'Invalid request format'
+      })
+    }
   })
 }
