@@ -99,7 +99,7 @@ module.exports = app => {
       todo.done = options.hasOwnProperty('done') ? options.done : todo.done
 
       res.send({
-        reponse: 'ok'
+        response: 'ok'
       })
     } else {
       res.send({
