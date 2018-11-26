@@ -14,8 +14,6 @@ module.exports = app => {
     const root = db.getRoot()
     const hash = req.params.hash
 
-    console.log(root)
-
     const todos = root.todos[hash]
 
     if (!root.todos.hasOwnProperty(hash)) {
